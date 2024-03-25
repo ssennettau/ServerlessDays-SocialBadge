@@ -1,0 +1,6 @@
+# Ignore Custom Fonts due to OFL
+fonts/
+
+# And Pillow due to the Cython weirdness
+PIL/
+pillow*/

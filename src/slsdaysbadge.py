@@ -1,11 +1,11 @@
+import io
+
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-
-
-def build_badge(in_headshot, in_name, in_title):
+def build_badge(in_headshot, in_name, in_title) -> str:
     # Get the base images
     bg = Image.open("template.jpg")
-    headshot = Image.open(in_headshot)
+    headshot = Image.open(io.BytesIO(in_headshot))
     headshot = ImageOps.fit(headshot, (500,500))
 
     # Compose the Working Image
@@ -50,10 +50,14 @@ def build_badge(in_headshot, in_name, in_title):
     img = Image.alpha_composite(img,text_layer)
 
     # Output the result
-    return img
+
+    data = io.BytesIO()
+    img.save(data, format="PNG")
+
+    return data.getvalue()
 
 if __name__ == "__main__":
     badge = build_badge("head.jpg",
                 "Bilbo X. Baggins", 
                 "Chief Cloud Architect at Hobbiton")
-    badge.show()
+    print(badge[:64])
