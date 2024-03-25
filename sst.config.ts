@@ -1,6 +1,6 @@
 import { SSTConfig } from "sst";
 import { Api, Function } from "sst/constructs";
-import { Bucket } from "aws-cdk-lib/aws-s3";
+import { Bucket, BucketPolicy } from "aws-cdk-lib/aws-s3";
 import { RemovalPolicy } from "aws-cdk-lib/core";
 
 export default {
@@ -13,7 +13,14 @@ export default {
   stacks(app) {
     app.stack(function Site({ stack }) {
       const badgeBucket = new Bucket(stack, "badgeBucket", {
+        blockPublicAccess: {
+          blockPublicAcls: true,
+          blockPublicPolicy: false,
+          ignorePublicAcls: true,
+          restrictPublicBuckets: false,
+        },
         removalPolicy: RemovalPolicy.DESTROY,
+        publicReadAccess: true,
       });
 
       const badgeFunction = new Function(stack, "badgeFunction", {
