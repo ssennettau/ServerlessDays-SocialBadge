@@ -55,9 +55,3 @@ def build_badge(in_headshot, in_name, in_title) -> str:
     img.save(data, format="PNG")
 
     return data.getvalue()
-
-if __name__ == "__main__":
-    badge = build_badge("head.jpg",
-                "Bilbo X. Baggins", 
-                "Chief Cloud Architect at Hobbiton")
-    print(badge[:64])

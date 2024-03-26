@@ -1,0 +1,83 @@
+<div> 
+    <form id="uploadForm">
+        <input type="text" id="name" name="name" placeholder="Name" maxlength="36" required>
+        <input type="text" id="title" name="title" placeholder="Title" maxlength="68" required>
+        <input type="file" id="headshot" name="headshot">
+        <button type="submit">Generate</button>
+        <p id="badgeStatus">&nbsp;</p>
+    </form>
+</div>
+<div id="imageContainer"></div>
+
+<script type="application/javascript">
+    const form = document.getElementById('uploadForm');
+    const imageContainer = document.getElementById('imageContainer');
+    const messageElement = document.getElementById('badgeStatus');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const textName = document.getElementById('name');
+        const textTitle = document.getElementById('title');
+        const fileHeadshot = document.getElementById('headshot');
+
+        let validationMessages = [];
+
+        if (!textName.value.trim()) {
+          validationMessages.push("Missing Name");
+        }
+        if (!textTitle.value.trim()) {
+          validationMessages.push("Missing Title");
+        }
+        if (!fileHeadshot.files.length) {
+          validationMessages.push("Missing Headshot");
+        }
+
+        if (validationMessages.length > 0) {
+          messageElement.textContent = validationMessages.join(', ');
+          messageElement.style.color = 'red';
+          return;
+        }
+
+        messageElement.textContent = "Generating...";
+        messageElement.style.color = "blue";
+
+        const formData = new FormData();
+        formData.append('name', textName.value);
+        formData.append('title', textTitle.value);
+        formData.append('headshot', fileHeadshot.files[0]);
+
+        fetch('https://<REST_API_FQDN_HERE>/badge', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const imageUrl = data.uri;
+
+            const aElement = document.createElement('a');
+            aElement.href = imageUrl;
+            aElement.download = true;
+
+            const imgElement = document.createElement('img');
+            imgElement.src = imageUrl;
+
+            imageContainer.innerHTML = ''; // Clear previous images
+            imageContainer.appendChild(aElement);
+            aElement.appendChild(imgElement);
+
+            messageElement.textContent = '';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            messageElement.textContent = '⛔️ Error uploading the file (JPG/PNG)';
+            messageElement.style.color = 'red';
+        });
+    });
+</script>
+
