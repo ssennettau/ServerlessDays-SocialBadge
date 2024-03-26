@@ -11,7 +11,7 @@ def check_img_exists(hash):
     resource = boto3.resource("s3")
 
     try:
-        resource.Object(BUCKET_NAME, "/generated/" + filename).load()
+        resource.Object(BUCKET_NAME, "generated/" + filename).load()
     except:
         # Cache Miss
         return False
