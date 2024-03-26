@@ -34,6 +34,9 @@ export default {
         permissions: [
           badgeBucket,
         ],
+        layers: [
+          "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p311-Pillow:3",
+        ]
       })
 
       const api = new Api(stack, "api", {
