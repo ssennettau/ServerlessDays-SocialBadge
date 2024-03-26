@@ -1,27 +1,29 @@
 import json
 
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
+
 import slsdaysbadge
 import s3
 import utils
 
-cors_headers = {
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "OPTIONS,POST",
-    "Access-Control-Expose-Headers": "X-Amzn-Trace-Id",
-}
+logger = Logger()
 
-def handler(event, context):
+@logger.inject_lambda_context
+def handler(event: dict, context: LambdaContext):
     print(event) #TODO: DEBUG
 
+    # Parse out the event
     data = utils.parse_multipart(event["body"])
     hash = utils.hash_request(data)
 
-    # TODO: Check if already exists, else do stuff
+    # Check if it's already been created
     exists = s3.check_img_exists(hash)
     if exists:
+        # If exists, pass back the URL
         upload = exists
     else:
+        # If not, create the badge
         badge = slsdaysbadge.build_badge(
             in_headshot = data["headshot"],
             in_name = data["name"],
@@ -34,9 +36,16 @@ def handler(event, context):
             badge,
         )
 
+    logger.info({
+        "name": data["name"],
+        "title": data["title"],
+        "path": upload,
+        "cache": exists,
+    })
+
     return {
         "statusCode": 200,
-        "headers": cors_headers,
+        "headers": utils.cors_headers,
         "body": json.dumps({
             "uri": upload,
         }),
