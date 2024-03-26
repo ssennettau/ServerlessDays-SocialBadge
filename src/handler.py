@@ -1,7 +1,7 @@
 import json
 
 import slsdaysbadge
-import s3uploader
+import s3
 import utils
 
 cors_headers = {
@@ -17,23 +17,27 @@ def handler(event, context):
     data = utils.parse_multipart(event["body"])
     hash = utils.hash_request(data)
 
-    badge = slsdaysbadge.build_badge(
-        in_headshot = data["headshot"],
-        in_name = data["name"],
-        in_title = data["title"],
-    )
+    # TODO: Check if already exists, else do stuff
+    exists = s3.check_img_exists(hash)
+    if exists:
+        upload = exists
+    else:
+        badge = slsdaysbadge.build_badge(
+            in_headshot = data["headshot"],
+            in_name = data["name"],
+            in_title = data["title"],
+        )
 
-    # Upload to S3
-    upload = s3uploader.upload_img_to_s3(
-        (hash + ".png"),
-        badge,
-    )
+        # Upload to S3
+        upload = s3.upload_img_to_s3(
+            (hash + ".png"),
+            badge,
+        )
 
     return {
         "statusCode": 200,
         "headers": cors_headers,
         "body": json.dumps({
             "uri": upload,
-            "event": event,
-        })
+        }),
     }

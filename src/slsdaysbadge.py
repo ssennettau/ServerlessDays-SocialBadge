@@ -16,11 +16,11 @@ def build_badge(in_headshot, in_name, in_title) -> str:
     # Add text
     font_regular = ImageFont.truetype(
         "./fonts/OpenSans-Regular.ttf",
-        48
+        36,
     )
     font_bold = ImageFont.truetype(
         "./fonts/OpenSans-Bold.ttf",
-        60
+        60,
     )
 
     text_layer = Image.new(
