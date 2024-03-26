@@ -38,3 +38,10 @@ def hash_request(request):
 
     return hash.hexdigest()
 
+cors_headers = {
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "OPTIONS,POST",
+    "Access-Control-Expose-Headers": "X-Amzn-Trace-Id",
+}
+
